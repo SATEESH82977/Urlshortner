@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta property="og:title" content="🔗 MyShortz - URL Shortener" />
+  <meta property="og:description" content="Shorten your URLs with MyShortz! Quick, easy, and fun." />
+  <meta property="og:image" content="https://img.icons8.com/color/48/link.png" />
+  <meta property="og:url" content="https://yourwebsite.com" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="🔗 MyShortz - URL Shortener" />
+  <meta name="twitter:description" content="Shorten your URLs with MyShortz! Quick, easy, and fun." />
+  <meta name="twitter:image" content="https://img.icons8.com/color/48/link.png" />
+  <title>🔗 MyShortz - URL Shortener</title>
+  <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/link.png">
+  <style>
+    :root {
+      --bg: #f0f0f3;
+      --text: #111;
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --btn-bg: linear-gradient(to right, #fc6076, #ff9a44);
+      --copy-btn: linear-gradient(to right, #8e2de2, #4a00e0);
+    }
+
+    body.dark {
+      --bg: #1e1e2f;
+      --text: #f9f9f9;
+      --card-bg: rgba(30, 30, 47, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 95%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      animation: fadeIn 1s ease-out;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #fc6076, #8e2de2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 20px;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="url"]:focus {
+      border-color: #fc6076;
+    }
+
+    button {
+      background: var(--btn-bg);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin: 0.25rem;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    .result, .history {
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .short-url {
+      background: white;
+      color: black;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      word-break: break-word;
+    }
+
+    .copy-btn {
+      background: var(--copy-btn);
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: white;
+      border: none;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .qr-code {
+      margin-top: 1rem;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    .toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .history ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .history li {
+      background: rgba(255, 255, 255, 0.6);
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 10px;
+      word-break: break-word;
+    }
+
+    body.dark .short-url,
+    body.dark .history li {
+      background: #333;
+      color: #fff;
+    }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        padding: 1.5rem;
+      }
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">🌗 Toggle Dark Mode</button>
+  <div class="container">
+    <img class="logo" src="https://img.icons8.com/color/48/link.png" alt="Logo">
+    <h1>MyShortz 🔗</h1>
+    <input type="url" id="longUrl" placeholder="Paste a long URL here..." />
+    <button onclick="shortenUrl()" aria-label="Shorten URL">🔗 Shorten</button>
+
+    <div class="result" id="result">
+      <div class="short-url" id="shortUrl"></div>
+      <button class="copy-btn" onclick="copyToClipboard()" aria-label="Copy shortened URL">📋 Copy</button>
+      <div class="qr-code" id="qrCode"></div>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="history" id="history">
+      <h3>📜 History</h3>
+      <ul id="historyList"></ul>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+      <button class="copy-btn" onclick="shareLinks()" aria-label="Share all links">📤 Share All</button>
+      <button class="copy-btn" onclick="exportHistory('txt')" aria-label="Export history as text">📄 Export TXT</button>
+      <button class="copy-btn" onclick="exportHistory('json')" aria-label="Export history as JSON">🗂️ Export JSON</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      loadHistory();
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark");
+      }
+    });
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    async function shortenUrl() {
+      const input = document.getElementById("longUrl");
+      const url = input.value.trim();
+      const shortUrlDiv = document.getElementById("shortUrl");
+      const resultDiv = document.getElementById("result");
+      const qrCodeDiv = document.getElementById("qrCode");
+      const errorDiv = document.getElementById("error");
+
+      resultDiv.style.display = "none";
+      errorDiv.textContent = "";
+      qrCodeDiv.innerHTML = "";
+
+      if (!url) {
+        errorDiv.textContent = "Please enter a valid URL.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+
+        if (data.ok) {
+          const short = data.result.full_short_link;
+          shortUrlDiv.textContent = short;
+          resultDiv.style.display = "block";
+          generateQRCode(short);
+          saveToHistory(url, short);
+        } else {
+          errorDiv.textContent = "Could not shorten the URL.";
+        }
+      } catch (err) {
+        errorDiv.textContent = "Network error. Please try again.";
+        console.error(err);
+      }
+    }
+
+    function copyToClipboard() {
+      const text = document.getElementById("shortUrl").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+      });
+    }
+
+    function generateQRCode(link) {
+      const qr = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(link)}&size=150x150`;
+      document.getElementById("qrCode").innerHTML = `<img src="${qr}" alt="QR Code">`;
+    }
+
+    function saveToHistory(original, short) {
+      const entry = { original, short };
+      const history = JSON.parse(localStorage.getItem("urlHistory")) || [];
+      history.unshift(entry);
+      localStorage.setItem("urlHistory", JSON.stringify(history.slice(0, 10))); // limit to 10 entries
+      loadHistory();
+    }
+
+    function loadHistory() {
+      const historyList = document.getElementById("historyList");
+      const history = JSON.parse(localStorage.getItem("urlHistory")) || [];
+      historyList.innerHTML = "";
+      history.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>Original:</strong> ${item.original}<br/><strong>Short:</strong> <a href="${item.short}" target="_blank">${item.short}</a>`;
+        historyList.appendChild(li);
+      });
+
+      document.getElementById("history").style.display = history.length > 0 ? "block" : "none";
+    }
+
+    function shareLinks() {
+      const history = JSON.parse(localStorage.getItem("urlHistory")) || [];
+      if (history.length === 0) {
+        alert("No links to share.");
+        return;
+      }
+
+      let text = "📋 My Shortened URLs:\n\n";
+      history.forEach((item, i) => {
+        text += `${i + 1}. ${item.short} (from ${item.original})\n`;
+      });
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("All links copied to clipboard! Share them anywhere.");
+      });
+    }
+
+    function exportHistory(type) {
+      const history = JSON.parse(localStorage.getItem("urlHistory")) || [];
+      if (history.length === 0) {
+        alert("No history to export.");
+        return;
+      }
+
+      let data, filename, mime;
+      if (type === 'json') {
+        data = JSON.stringify(history, null, 2);
+        filename = "short_url_history.json";
+        mime = "application/json";
+      } else {
+        data = history.map((h, i) => `${i + 1}. ${h.original} → ${h.short}`).join('\n');
+        filename = "short_url_history.txt";
+        mime = "text/plain";
+      }
+
+      const blob = new Blob([data], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
